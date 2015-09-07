@@ -25,6 +25,7 @@ blacklists = [
         "rbl.efnetrbl.org",
         "torexit.dan.me.uk",
         "tor.dnsbl.sectoor.de",
+        "xbl.spamhaus.org",
         ]
 
 dnsResolver = None

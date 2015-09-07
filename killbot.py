@@ -83,8 +83,9 @@ def processJoin(bot, trigger):
         for r in blResult:
             stderr(r)
             if r[1] != False:
-                ban = True
-                why += "HIT: %s %s " % (r[0], r[1])
+                if r[1] != None:
+                    ban = True
+                    why += "HIT: %s %s " % (r[0], r[1])
         if ban == True:
             bot.msg(bot.config.killbot.control_channel, 'I would have banned %s on %s because of a blacklist hit.' % (trigger.nick, trigger.sender))
             bot.msg(bot.config.killbot.control_channel, why)

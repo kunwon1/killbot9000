@@ -72,8 +72,6 @@ def doRBLLookup(bot, trigger):
 @sopel.module.rule('.*')
 @sopel.module.priority('high')
 def processJoin(bot, trigger):
-    #stderr(type(trigger.host))
-    #stderr(trigger.host)
     ips = getIPList(trigger.host)
 
     for ip in ips:

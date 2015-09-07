@@ -16,6 +16,15 @@ from dnsbl import Base
 blacklists = [
         "dnsbl.dronebl.org",
         "cbl.abuseat.org",
+        "http.dnsbl.sorbs.net",
+        "misc.dnsbl.sorbs.net",
+        "socks.dnsbl.sorbs.net",
+        "proxies.dnsbl.sorbs.net",
+        "tor.efnet.org",
+        "rbl.efnet.org",
+        "rbl.efnetrbl.org",
+        "torexit.dan.me.uk",
+        "tor.dnsbl.sectoor.de",
         ]
 
 dnsResolver = None
@@ -53,9 +62,8 @@ def doRBLLookup(bot, trigger):
         checkResults = baseRBLLookup(trigger.group(2))
         rep = ""
         for r in checkResults:
-            print r
             if r[1] != False:
-                rep += "HIT: %s %s |" % (r[0], r[1])
+                rep += "HIT: %s %s " % (r[0], r[1])
         if rep == "":
             rep = "No hits"
         bot.reply(rep)
@@ -69,7 +77,21 @@ def processJoin(bot, trigger):
     ips = getIPList(trigger.host)
 
     for ip in ips:
-        bot.msg(bot.config.killbot.control_channel, ip)
+        bot.msg(bot.config.killbot.control_channel, 'doing lookup on %s' % ip)
+        blResult = baseRBLLookup(ip)
+        ban = False
+        why = ''
+        for r in blResult:
+            stderr(r)
+            if r[1] != False:
+                ban = True
+                why += "HIT: %s %s " % (r[0], r[1])
+        if ban == True:
+            bot.msg(bot.config.killbot.control_channel, 'I would have banned %s on %s because of a blacklist hit.' % (trigger.nick, trigger.sender))
+            bot.msg(bot.config.killbot.control_channel, why)
+        else:
+            bot.msg(bot.config.killbot.control_channel, '%s is clean.' % trigger.host)
+
 
 def baseRBLLookup(ip):
     backend = Base(ip=ip, providers=blacklists)

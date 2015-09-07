@@ -32,8 +32,10 @@ def process_join(bot, trigger):
         ipv4 = dnsResolver.query(trigger.host,'A')
         ipv6 = dnsResolver.query(trigger.host,'AAAA')
         for a in ipv4:
+            stderr('    resolved A record to %s' % a)
             iplist.append('%s' % a)
         for aaaa in ipv6:
+            stderr('    resolved AAAA record to %s' % aaaa)
             iplist.append('%s' % aaaa)
     else:
         #this is already an ip address, save it

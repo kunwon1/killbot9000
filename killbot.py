@@ -63,7 +63,8 @@ def doRBLLookup(bot, trigger):
         rep = ""
         for r in checkResults:
             if r[1] != False:
-                rep += "HIT: %s %s " % (r[0], r[1])
+                if r[1] != None:
+                    rep += "HIT: %s %s " % (r[0], r[1])
         if rep == "":
             rep = "No hits"
         bot.reply(rep)

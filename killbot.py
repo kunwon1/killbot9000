@@ -1,3 +1,6 @@
+from gevent import monkey
+monkey.patch_all()
+
 import sys
 import sopel.module
 from sopel.tools import stderr
@@ -5,9 +8,6 @@ from sopel.tools import stderr
 import socket
 import gevent
 import dns.resolver
-from gevent import monkey
-
-monkey.patch_all()
 sys.path.append('/usr/local/lib/python2.7/site-packages')
 from dnsbl import Base
 

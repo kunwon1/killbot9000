@@ -1,8 +1,22 @@
+import sys
 import sopel.module
 from sopel.tools import stderr
 
 import socket
+import gevent
 import dns.resolver
+from gevent import monkey
+
+monkey.patch_all()
+sys.path.append('/usr/local/lib/python2.7/site-packages')
+from dnsbl import Base
+
+#TODO gateway cloak support
+
+blacklists = [
+        "dnsbl.dronebl.org",
+        "cbl.abuseat.org",
+        ]
 
 dnsResolver = None
 
@@ -23,9 +37,28 @@ def doManualLookup(bot, trigger):
         return
     else:
         list = getIPList(trigger.group(2))
-        for ip in list:
-            bot.reply(ip)
+        rep = " ".join(list)            
+        bot.reply(rep)
 
+@sopel.module.commands('rbl')
+@sopel.module.priority('low')
+@sopel.module.require_admin
+@sopel.module.example('.rbl 8.8.8.8 or .rbl google.com')
+def doRBLLookup(bot, trigger):
+    stderr('foo')
+    if not trigger.sender == bot.config.killbot.control_channel:
+        return
+    else:
+        stderr('doing lookup, got %s' % trigger.group(2))
+        checkResults = baseRBLLookup(trigger.group(2))
+        rep = ""
+        for r in checkResults:
+            print r
+            if r[1] != False:
+                rep += "HIT: %s %s |" % (r[0], r[1])
+        if rep == "":
+            rep = "No hits"
+        bot.reply(rep)
 
 @sopel.module.event('JOIN')
 @sopel.module.rule('.*')
@@ -38,6 +71,9 @@ def processJoin(bot, trigger):
     for ip in ips:
         bot.msg(bot.config.killbot.control_channel, ip)
 
+def baseRBLLookup(ip):
+    backend = Base(ip=ip, providers=blacklists)
+    return backend.check()
 
 def getIPList(hostname):
 

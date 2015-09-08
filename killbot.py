@@ -34,10 +34,6 @@ def setup(bot):
     global dnsResolver
     dnsResolver = dns.resolver.Resolver()
 
-@sopel.module.commands('helloworld')
-def helloworld(bot, trigger):
-    bot.say('Hello, world!')
-
 @sopel.module.commands('host')
 @sopel.module.priority('low')
 @sopel.module.require_admin

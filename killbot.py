@@ -55,11 +55,9 @@ def doManualLookup(bot, trigger):
 @sopel.module.require_admin
 @sopel.module.example('.rbl 8.8.8.8 or .rbl google.com')
 def doRBLLookup(bot, trigger):
-    stderr('foo')
     if not trigger.sender == bot.config.killbot.control_channel:
         return
     else:
-        stderr('doing lookup, got %s' % trigger.group(2))
         checkResults = baseRBLLookup(trigger.group(2))
         rep = ""
         for r in checkResults:
@@ -88,6 +86,9 @@ def processJoin(bot, trigger):
                     ban = True
                     why += "HIT: %s %s " % (r[0], r[1])
         if ban == True:
+            if trigger.sender == '##politics':
+                bot.write(['MODE', trigger.sender, '+b', '*!*@' + trigger.host])
+                bot.write(['REMOVE', trigger.sender, trigger.nick], "This host has violated channel policy.")
             bot.msg(bot.config.killbot.control_channel, 'I would have banned %s on %s because of a blacklist hit.' % (trigger.nick, trigger.sender))
             bot.msg(bot.config.killbot.control_channel, why)
         else:
@@ -95,7 +96,7 @@ def processJoin(bot, trigger):
 
 
 def baseRBLLookup(ip):
-    backend = Base(ip=ip, providers=blacklists)
+    backend = Base(ip=ip, providers=blacklists, timeout=10)
     return backend.check()
 
 def getIPList(hostname):
